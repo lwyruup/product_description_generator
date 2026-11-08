@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Product Card Generator</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js" defer></script>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-content">
+        <div class="brand">
+            <div class="brand-icon">✦</div>
+
+            <div>
+                <h1>Генератор B2B-карточек товаров</h1>
+            </div>
+        </div>
+
+        <div class="header-status">
+            <span id="status-dot" class="status-dot"></span>
+            <span id="api-status">Проверка API...</span>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="intro">
+        <div class="eyebrow"></div>
+
+        <h2>Создание товарных карточек</h2>
+
+        <p>
+            Превратите технические характеристики оборудования
+            в структурированную B2B-карточку с SEO-описанием,
+            поисковыми запросами и коммерческим блоком.
+        </p>
+    </section>
+
+    <div class="workspace">
+
+        <!-- LEFT PANEL -->
+
+        <section class="panel input-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Исходные данные</h3>
+                    <p>Укажите информацию о товаре</p>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="form">
+                    Форма
+                </button>
+
+                <button class="tab" data-tab="json">
+                    JSON
+                </button>
+            </div>
+
+            <!-- FORM -->
+
+            <div id="form-tab" class="tab-content active">
+
+                <div class="field">
+                    <label for="product-name">
+                        Название товара <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="product-name"
+                        type="text"
+                        placeholder="Например: Манометр DM 02"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="manufacturer">Производитель</label>
+
+                    <input
+                        id="manufacturer"
+                        type="text"
+                        placeholder="Например: Манотомь"
+                    >
+                </div>
+
+                <div class="field">
+
+                    <div class="field-header">
+                        <label>Технические характеристики</label>
+
+                        <button
+                            type="button"
+                            class="text-button"
+                            id="add-spec"
+                        >
+                            + Добавить
+                        </button>
+                    </div>
+
+                    <div id="specs-container"></div>
+
+                    <p class="field-hint">
+                        Укажите название характеристики и её значение.
+                    </p>
+
+                </div>
+
+                <div class="field">
+                    <label for="description">
+                        Исходное описание
+                    </label>
+
+                    <textarea
+                        id="description"
+                        rows="6"
+                        placeholder="Вставьте описание товара или фрагмент технического паспорта..."
+                    ></textarea>
+                </div>
+
+            </div>
+
+            <!-- JSON -->
+
+            <div id="json-tab" class="tab-content">
+
+                <div class="field">
+                    <label for="json-input">Входной JSON</label>
+
+                    <textarea
+                        id="json-input"
+                        class="json-editor"
+                        spellcheck="false"
+                        placeholder='{"name": "Манометр DM 02", "specs": {}}'
+                    ></textarea>
+                </div>
+
+                <button
+                    id="format-json"
+                    type="button"
+                    class="secondary-button"
+                >
+                    Форматировать JSON
+                </button>
+
+            </div>
+
+            <div id="error-message" class="error-message hidden"></div>
+
+            <div class="input-actions">
+
+                <button
+                    id="clear-button"
+                    type="button"
+                    class="secondary-button"
+                >
+                    Очистить
+                </button>
+
+                <button
+                    id="generate-button"
+                    type="button"
+                    class="primary-button"
+                >
+                    <span id="generate-text">✦ Сгенерировать</span>
+                    <span id="generate-loader" class="loader hidden"></span>
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- RIGHT PANEL -->
+
+        <section class="panel result-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>Результат генерации</h3>
+                    <p>Готовая карточка для контент-менеджера</p>
+                </div>
+
+                <button
+                    id="copy-all"
+                    class="secondary-button hidden"
+                    type="button"
+                >
+                    Копировать JSON
+                </button>
+            </div>
+
+            <!-- EMPTY STATE -->
+
+            <div id="empty-state" class="empty-state">
+
+                <div class="empty-icon">✦</div>
+
+                <h3>Карточка ещё не создана</h3>
+
+                <p>
+                    Заполните информацию о товаре
+                    и нажмите «Сгенерировать».
+                </p>
+
+            </div>
+
+            <!-- RESULT -->
+
+            <div id="result-content" class="result-content hidden">
+
+                <div class="result-section">
+
+                    <div class="result-heading">
+                        <h4>SEO-заголовок</h4>
+                        <span id="title-counter" class="counter"></span>
+                    </div>
+
+                    <div class="result-box">
+                        <p id="seo-title"></p>
+                    </div>
+
+                    <button
+                        class="copy-link"
+                        data-copy="seo-title"
+                    >
+                        Копировать
+                    </button>
+
+                </div>
+
+                <div class="result-section">
+
+                    <div class="result-heading">
+                        <h4>SEO-описание</h4>
+                        <span id="description-counter" class="counter"></span>
+                    </div>
+
+                    <div class="result-box">
+                        <p id="seo-description"></p>
+                    </div>
+
+                    <button
+                        class="copy-link"
+                        data-copy="seo-description"
+                    >
+                        Копировать
+                    </button>
+
+                </div>
+
+                <div class="result-section">
+
+                    <div class="result-heading">
+                        <h4>Характеристики</h4>
+                    </div>
+
+                    <div id="specifications-result"></div>
+
+                </div>
+
+                <div class="result-section">
+
+                    <div class="result-heading">
+                        <h4>Поисковые запросы</h4>
+                    </div>
+
+                    <div id="search-queries" class="tags"></div>
+
+                </div>
+
+                <div class="result-section">
+
+                    <div class="result-heading">
+                        <h4>Коммерческий блок</h4>
+                    </div>
+
+                    <div class="result-box">
+                        <p id="commercial-block"></p>
+                    </div>
+
+                    <button
+                        class="copy-link"
+                        data-copy="commercial-block"
+                    >
+                        Копировать
+                    </button>
+
+                </div>
+
+                <div class="result-section">
+
+                    <div class="result-heading">
+                        <h4>Недостающие сведения</h4>
+                    </div>
+
+                    <div id="missing-fields" class="missing-fields"></div>
+
+                </div>
+
+                <div class="result-note">
+                    AI-контент рекомендуется проверить перед публикацией.
+                    Технические характеристики должны соответствовать
+                    документации производителя.
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<div id="toast" class="toast"></div>
+
+</body>
+</html>
