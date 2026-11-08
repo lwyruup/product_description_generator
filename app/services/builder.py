@@ -25,9 +25,7 @@ def build_verified_facts(product: ProductInput) -> str:
         lines.append("Технические характеристики:")
         for key, value in product.specs.items():
             if value and str(value).strip():
-                lines.append(
-                    f"- {normalize_text(key)}: {normalize_text(value)}"
-                )
+                lines.append(f"- {normalize_text(key)}: {normalize_text(value)}")
 
     return "\n".join(lines)
 
